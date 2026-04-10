@@ -15,9 +15,9 @@ Route::get('/', function () {
     return redirect()->route('companies.index');
 });
 
-Route::resource('companies', CompanyController::class);
-Route::resource('products', ProductController::class);
-Route::resource('sizes', PackageSizeController::class);
+Route::resource('/admin/companies', CompanyController::class);
+Route::resource('/admin/companies/products', ProductController::class);
+Route::resource('/admin/companies/sizes', PackageSizeController::class);
 
 
 Route::prefix('admin')->name('admin.')->group(function () {

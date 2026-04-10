@@ -11,6 +11,25 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ url('/admin/companies') }}" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Companies</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/admin/companies/products') }}" class="nav-link">
+                        <i class="nav-icon fas fa-box   "></i>
+                        <p>Products</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/admin/companies/sizes') }}" class="nav-link">
+                        <i class="nav-icon fas fa-ruler-combined"></i>
+                        <p>Sizes</p>
+                    </a>
+                </li>
+
             </ul>
         </nav>
     </div>

@@ -4,11 +4,23 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Company;
+use App\Models\Product;
+use App\Models\PackageSize;
 
 class DashboardController extends Controller
 {
     public function index()
 {
-    return view('admin.dashboard');
+    $totalCompanies = Company::count();
+    $totalProducts  = Product::count();
+    $totalSizes     = PackageSize::count();
+    
+
+    return view('admin.dashboard', compact(
+        'totalCompanies',
+        'totalProducts',
+        'totalSizes'
+    ));
 }
 }
