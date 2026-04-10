@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Company;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -12,8 +13,8 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::all();
-        return view('companies.index', compact('companies'));
+        $companies = Company::latest()->paginate(10);
+        return view('admin.companies.index', compact('companies'));
     }
 
     /**
@@ -21,7 +22,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        return view('companies.create');
+        return view('admin.companies.create');
     }
 
     /**
@@ -29,17 +30,33 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        Company::create($request->all());
-        return redirect()->route('companies.index');
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'nullable|email|max:255',
+            'phone'   => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'website' => 'nullable|url|max:255',
+            'logo'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->except('logo');
+
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        Company::create($data);
+
+        return redirect()->route('companies.index')
+                         ->with('success', 'Company created successfully!');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Company $company)
     {
-        $company = Company::with('products')->findOrFail($id);
-        return view('companies.show', compact('company'));
+        return view('admin.companies.show', compact('company'));
     }
 
     /**
@@ -47,15 +64,38 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        //
+        return view('admin.companies.edit', compact('company'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Company $company)
     {
-        //
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'nullable|email|max:255',
+            'phone'   => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'website' => 'nullable|url|max:255',
+            'logo'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->except('logo');
+
+        if ($request->hasFile('logo')) {
+            // Delete old logo
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        $company->update($data);
+
+        return redirect()->route('companies.index')
+                         ->with('success', 'Company updated successfully!');
     }
 
     /**
@@ -63,6 +103,12 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+        if ($company->logo) {
+            Storage::disk('public')->delete($company->logo);
+        }
+        $company->delete();
+
+        return redirect()->route('companies.index')
+                         ->with('success', 'Company deleted successfully!');
     }
 }

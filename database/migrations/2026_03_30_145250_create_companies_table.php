@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
     $table->string('name');
     $table->string('logo')->nullable();
+    $table->string('email')->nullable()->after('name');
+        $table->string('phone')->nullable()->after('email');
+        $table->text('address')->nullable()->after('phone');
+        $table->string('website')->nullable()->after('address');
     $table->timestamps();
         });
     }
@@ -24,6 +28,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropColumn(['email', 'phone', 'address', 'website']);
+        });
     }
 };

@@ -15,12 +15,13 @@ class DashboardController extends Controller
     $totalCompanies = Company::count();
     $totalProducts  = Product::count();
     $totalSizes     = PackageSize::count();
-    
+    $companies = Company::withCount('products')->latest()->get();
 
     return view('admin.dashboard', compact(
         'totalCompanies',
         'totalProducts',
-        'totalSizes'
+        'totalSizes',
+        'companies'
     ));
 }
 }
