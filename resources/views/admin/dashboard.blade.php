@@ -115,10 +115,12 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <span class="badge badge-success">
-                                        {{ $company->products_count }} Products
-                                    </span>
-                                </td>
+    <a href="{{ route('products.index', ['company_id' => $company->id]) }}">
+        <span class="badge badge-success">
+            {{ $company->products_count }} Products
+        </span>
+    </a>
+</td>
                                 <td>
                                     <a href="{{ route('companies.show', $company->id) }}" class="btn btn-xs btn-info">
                                         <i class="fas fa-eye"></i> View

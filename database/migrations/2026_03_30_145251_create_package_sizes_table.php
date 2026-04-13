@@ -6,25 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('package_sizes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->integer('length');
-            $table->integer('width');
-            $table->integer('height');
+            $table->string('name');                          // Small, Medium, Large
+            $table->decimal('length', 8, 2)->nullable();    // cm
+            $table->decimal('width', 8, 2)->nullable();     // cm
+            $table->decimal('height', 8, 2)->nullable();    // cm
+            $table->decimal('weight', 8, 2)->nullable();    // kg
+            $table->string('unit')->default('cm');          // cm / inch / mm
             $table->string('image')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('package_sizes');

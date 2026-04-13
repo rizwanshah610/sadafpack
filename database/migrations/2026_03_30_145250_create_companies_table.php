@@ -6,30 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-    $table->string('name');
-    $table->string('logo')->nullable();
-    $table->string('email')->nullable()->after('name');
-        $table->string('phone')->nullable()->after('email');
-        $table->text('address')->nullable()->after('phone');
-        $table->string('website')->nullable()->after('address');
-    $table->timestamps();
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->string('website')->nullable();
+            $table->string('logo')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->dropColumn(['email', 'phone', 'address', 'website']);
-        });
+        Schema::dropIfExists('companies');
     }
 };

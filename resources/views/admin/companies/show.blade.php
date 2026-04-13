@@ -47,8 +47,10 @@
                             @else — @endif
                         </td></tr>
                         <tr><th>Total Products</th><td>
-                            <span class="badge badge-success">{{ $company->products->count() }} Products</span>
-                        </td></tr>
+    <a href="{{ route('products.index', ['company_id' => $company->id]) }}">
+        <span class="badge badge-success">{{ $company->products->count() }} Products</span>
+    </a>
+</td></tr>
                     </table>
                 </div>
             </div>

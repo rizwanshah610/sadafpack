@@ -9,10 +9,21 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     public function index()
-    {
-        $products = Product::with('company')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
-    }
+{
+    $company_id = request('company_id');
+
+    $products = Product::with('company', 'packageSizes')
+        ->when($company_id, function ($query) use ($company_id) {
+            $query->where('company_id', $company_id);
+        })
+        ->latest()
+        ->paginate(10);
+
+    $companies = Company::all();
+    $selectedCompany = $company_id ? Company::find($company_id) : null;
+
+    return view('admin.products.index', compact('products', 'companies', 'selectedCompany'));
+}
 
     public function create()
     {

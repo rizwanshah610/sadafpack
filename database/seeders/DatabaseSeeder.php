@@ -15,6 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Dummy Data
+        $this->call([
+            CompanySeeder::class,
+            ProductSeeder::class,
+            PackageSizeSeeder::class, // ✅ updated
+        ]);
+
         // User::factory(10)->create();
 
         User::factory()->create([
