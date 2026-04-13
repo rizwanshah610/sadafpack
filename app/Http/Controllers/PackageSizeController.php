@@ -1,81 +1,89 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\PackageSize;
 use App\Models\Product;
+use App\Models\PackageSize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PackageSizeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Product $product)
     {
-        //
+        $sizes = $product->packageSizes()->latest()->paginate(10);
+        return view('admin.sizes.index', compact('product', 'sizes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Product $product)
     {
-        $products = Product::all();
-    return view('sizes.create', compact('products'));
+        return view('admin.sizes.create', compact('product'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request, Product $product)
     {
-        $image = null;
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'length' => 'nullable|numeric',
+            'width'  => 'nullable|numeric',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'unit'   => 'nullable|string|max:50',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->except('image');
+        $data['product_id'] = $product->id;
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image')->store('packages', 'public');
+            $data['image'] = $request->file('image')->store('sizes', 'public');
         }
-    
-        PackageSize::create([
-            'product_id' => $request->product_id,
-            'length' => $request->length,
-            'width' => $request->width,
-            'height' => $request->height,
-            'image' => $image,
+
+        PackageSize::create($data);
+
+        return redirect()->route('products.sizes.index', $product->id)
+                         ->with('success', 'Size added successfully!');
+    }
+
+    public function edit(Product $product, PackageSize $size)
+    {
+        return view('admin.sizes.edit', compact('product', 'size'));
+    }
+
+    public function update(Request $request, Product $product, PackageSize $size)
+    {
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'length' => 'nullable|numeric',
+            'width'  => 'nullable|numeric',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'unit'   => 'nullable|string|max:50',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-    
-        return redirect()->back();
+
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            if ($size->image) {
+                Storage::disk('public')->delete($size->image);
+            }
+            $data['image'] = $request->file('image')->store('sizes', 'public');
+        }
+
+        $size->update($data);
+
+        return redirect()->route('products.sizes.index', $product->id)
+                         ->with('success', 'Size updated successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PackageSize $packageSize)
+    public function destroy(Product $product, PackageSize $size)
     {
-        //
-    }
+        if ($size->image) {
+            Storage::disk('public')->delete($size->image);
+        }
+        $size->delete();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PackageSize $packageSize)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PackageSize $packageSize)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PackageSize $packageSize)
-    {
-        //
+        return redirect()->route('products.sizes.index', $product->id)
+                         ->with('success', 'Size deleted successfully!');
     }
 }

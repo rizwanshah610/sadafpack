@@ -6,20 +6,23 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageSizeController;
 use App\Http\Controllers\Admin\DashboardController;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-
+// Redirect root to dashboard
 Route::get('/', function () {
-    return redirect()->route('companies.index');
+    return redirect()->route('dashboard');
 });
 
-Route::resource('/admin/companies', CompanyController::class);
-Route::resource('/admin/companies/products', ProductController::class);
-Route::resource('/admin/companies/sizes', PackageSizeController::class);
+Route::prefix('admin')->group(function () {
 
-
-Route::prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Companies CRUD
+    Route::resource('companies', CompanyController::class);
+
+    // Products CRUD
+    Route::resource('products', ProductController::class);
+
+    // Sizes CRUD (nested under products)
+    Route::resource('products.sizes', PackageSizeController::class);
+
 });
