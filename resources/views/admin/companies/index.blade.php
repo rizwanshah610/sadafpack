@@ -10,14 +10,27 @@
 
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building mr-2"></i> All Companies</h3>
-            <div class="card-tools">
-                <a href="{{ route('companies.create') }}" class="btn btn-sm btn-success">
-                    <i class="fas fa-plus mr-1"></i> Add Company
-                </a>
-            </div>
-        </div>
+    <div class="card-header d-flex align-items-center">
+    
+    <h3 class="card-title mb-0">
+        <i class="fas fa-building mr-2"></i> All Companies
+    </h3>
+
+    <!-- RIGHT SIDE -->
+    <div class="card-tools ml-auto d-flex align-items-center">
+
+        <!-- Search -->
+        <input type="text" id="searchInput"
+               class="form-control form-control-sm mr-2"
+               placeholder="Search..." style="width: 200px;">
+
+        <!-- Button -->
+        <a href="{{ route('companies.create') }}" class="btn btn-sm btn-success">
+            <i class="fas fa-plus mr-1"></i> Add Company
+        </a>
+
+    </div>
+</div>
         <div class="card-body p-0">
 
             @if(session('success'))
@@ -25,7 +38,7 @@
                     <i class="fas fa-check-circle mr-1"></i> {{ session('success') }}
                 </div>
             @endif
-
+      
             <table class="table table-striped table-hover mb-0">
                 <thead class="thead-dark">
                     <tr>
@@ -98,4 +111,15 @@
         </div>
     </div>
 </div>
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function () {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(function(row) {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(value) ? '' : 'none';
+    });
+});
+</script>
 @endsection

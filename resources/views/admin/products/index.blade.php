@@ -10,14 +10,27 @@
 
 <div class="container-fluid">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-box mr-2"></i> All Products</h3>
-            <div class="card-tools">
-                <a href="{{ route('products.create') }}" class="btn btn-sm btn-success">
-                    <i class="fas fa-plus mr-1"></i> Add Product
-                </a>
-            </div>
-        </div>
+    <div class="card-header d-flex align-items-center">
+    
+    <h3 class="card-title mb-0">
+        <i class="fas fa-box mr-2"></i> All Products
+    </h3>
+
+    <!-- RIGHT SIDE -->
+    <div class="card-tools ml-auto d-flex align-items-center">
+
+        <!-- Search -->
+        <input type="text" id="searchInput"
+               class="form-control form-control-sm mr-2"
+               placeholder="Search products..." style="width: 200px;">
+
+        <!-- Add Button -->
+        <a href="{{ route('products.create') }}" class="btn btn-sm btn-success">
+            <i class="fas fa-plus mr-1"></i> Add Product
+        </a>
+
+    </div>
+</div>
         <div class="card-body p-0">
 
             @if(session('success'))
@@ -99,4 +112,15 @@
         </div>
     </div>
 </div>
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function () {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(function(row) {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(value) ? '' : 'none';
+    });
+});
+</script>
 @endsection
