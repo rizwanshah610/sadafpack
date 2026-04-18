@@ -19,14 +19,18 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CompanySeeder::class,
             ProductSeeder::class,
-            PackageSizeSeeder::class, // ✅ updated
+            PackageSizeSeeder::class,
         ]);
 
-        // User::factory(10)->create();
-
+        // Create default super admin user
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);
+
+        // Roles and permissions (must run after user is created)
+        $this->call([
+            RolesAndPermissionsSeeder::class,
         ]);
     }
 }

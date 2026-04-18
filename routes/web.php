@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageSizeController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\StaffController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,18 +27,22 @@ Route::get('/', function () {
 */
 Route::middleware(['auth'])->prefix('admin')->group(function () {
 
-    // Admin Dashboard
+    // Admin Dashboard — accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('admin.dashboard');
 
-    // Companies CRUD
-    Route::resource('companies', CompanyController::class);
+    // Companies CRUD — super_admin and admin only
+    Route::middleware(['role:super_admin|admin'])->group(function () {
+        Route::resource('companies', CompanyController::class);
+        Route::resource('products', ProductController::class);
+        Route::resource('products.sizes', PackageSizeController::class);
+    });
 
-    // Products CRUD
-    Route::resource('products', ProductController::class);
+    // Staff Management — super_admin only
+    Route::middleware(['role:super_admin'])->group(function () {
+        Route::resource('staff', StaffController::class);
+    });
 
-    // Package Sizes (Nested)
-    Route::resource('products.sizes', PackageSizeController::class);
 });
 
 
