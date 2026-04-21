@@ -75,7 +75,11 @@ class StaffController extends Controller
     // Delete staff
     public function destroy(User $user)
     {
+
+        $user->roles()->detach();
+        $user->permissions()->detach();
         $user->delete();
+    
         return redirect()->route('staff.index')
             ->with('success', 'Staff member deleted successfully.');
     }

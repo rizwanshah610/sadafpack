@@ -40,8 +40,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // Staff Management — super_admin only
     Route::middleware(['role:super_admin'])->group(function () {
-        Route::resource('staff', StaffController::class);
+        Route::resource('staff', StaffController::class)->parameters([
+            'staff' => 'user'
+        ]);
     });
+
+
+    // Setting of CMS
+    Route::get('settings/general', [SettingsController::class, 'index'])->name('admin.settings.general');
+    Route::post('settings/general', [SettingsController::class, 'update'])->name('admin.settings.update');
 
 });
 
