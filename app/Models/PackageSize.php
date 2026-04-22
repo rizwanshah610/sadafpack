@@ -8,7 +8,16 @@ class PackageSize extends Model
     protected $table = 'package_sizes';
 
     protected $fillable = [
-        'product_id', 'name', 'length', 'width', 'height', 'weight', 'unit', 'image'
+        'product_id', 'name',
+        'length',
+        'width',
+        'height',
+        'sheet_size',
+        'color',
+        'ply',
+        'paper',
+        'nali',
+        'unit', 'image'
     ];
 
     public function product()

@@ -29,56 +29,82 @@
                 </div>
             @endif
 
-            <table class="table table-striped table-hover mb-0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Length</th>
-                        <th>Width</th>
-                        <th>Height</th>
-                        <th>Weight</th>
-                        <th>Unit</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($sizes as $size)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $size->name }}</td>
-                        <td>{{ $size->length }}</td>
-                        <td>{{ $size->width }}</td>
-                        <td>{{ $size->height }}</td>
-                        <td>{{ $size->weight ?? '—' }}</td>
-                        <td>{{ $size->unit ?? '—' }}</td>
-                        <td>
-                            <a href="{{ route('products.sizes.edit', [$product->id, $size->id]) }}"
-                               class="btn btn-xs btn-warning">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('products.sizes.destroy', [$product->id, $size->id]) }}"
-                                  method="POST" style="display:inline;"
-                                  onsubmit="return confirm('Delete this size?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-xs btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-3">
-                            <i class="fas fa-inbox mr-1"></i> No sizes found.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th> <th>Name</th>
+                            <th>Length</th>
+                            <th>Width</th>
+                            <th>Height</th>
+                            <th>Sheet Size</th>
+                            <th>Color</th>
+                            <th>Ply</th>
+                            <th>Paper</th>
+                            <th>Nali</th>
+                            <th>Unit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($sizes as $size)
+                        <tr>
+                            <td class="align-middle">{{ $loop->iteration }}</td>
+                            
+                            <td class="align-middle">
+    @if($size->image)
+        <img src="{{ asset('storage/' . $size->image) }}" 
+             alt="{{ $size->name }}" 
+             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 1px solid #ddd;">
+    @else
+        <img src="https://ui-avatars.com/api/?name={{ urlencode($size->name) }}&background=random&color=fff" 
+             alt="Avatar" 
+             style="width: 50px; height: 50px; border-radius: 50%;">
+    @endif
+</td>
+
+                            <td class="align-middle"><strong>{{ $size->name }}</strong></td>
+                            <td class="align-middle">{{ $size->length }}</td>
+                            <td class="align-middle">{{ $size->width }}</td>
+                            <td class="align-middle">{{ $size->height }}</td>
+                            <td class="align-middle">{{ $size->sheet_size ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->color ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->ply ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->paper ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->nali ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->unit ?? '—' }}</td>
+
+                            <td class="align-middle">
+                                <a href="{{ route('products.sizes.edit', [$product->id, $size->id]) }}"
+                                   class="btn btn-xs btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form action="{{ route('products.sizes.destroy', [$product->id, $size->id]) }}"
+                                      method="POST" style="display:inline;"
+                                      onsubmit="return confirm('Delete this size?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-xs btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="13" class="text-center text-muted py-3">
+                                <i class="fas fa-inbox mr-1"></i> No sizes found.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer clearfix">
             {{ $sizes->links() }}
         </div>
     </div>

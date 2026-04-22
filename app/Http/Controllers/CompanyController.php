@@ -12,10 +12,16 @@ class CompanyController extends Controller
      * Display a listing of the companies.
      */
     public function index()
-    {
-        $companies = Company::latest()->paginate(10);
-        return view('admin.companies.index', compact('companies'));
-    }
+{
+    $companies = Company::withCount([
+        'products',
+        'products as sizes_count' => function ($query) {
+            $query->join('package_sizes', 'package_sizes.product_id', '=', 'products.id');
+        }
+    ])->latest()->paginate(15);
+
+    return view('admin.companies.index', compact('companies'));
+}
 
     /**
      * Show the form for creating a new resource.

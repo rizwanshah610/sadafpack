@@ -95,6 +95,7 @@
                                 <th>#</th>
                                 <th>Company Name</th>
                                 <th>Total Products</th>
+                                <th>Total Sizes</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -121,6 +122,15 @@
         </span>
     </a>
 </td>
+
+<td>
+    <a href="{{ route('products.index', ['company_id' => $company->id]) }}">
+        <span class="badge badge-warning">
+            {{ $company->sizes_count }} Sizes
+        </span>
+    </a>
+</td>
+
                                 <td>
                                     <a href="{{ route('companies.show', $company->id) }}" class="btn btn-xs btn-info">
                                         <i class="fas fa-eye"></i> View
