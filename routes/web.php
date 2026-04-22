@@ -69,6 +69,13 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])
+        ->name('profile.avatar');
+
+    Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])
+        ->name('profile.avatar.remove');
+
 });
 
 

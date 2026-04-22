@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-
+use Illuminate\Support\Facades\Storage;
 class ProfileController extends Controller
 {
     /**
@@ -57,4 +57,43 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Avatar for user udpate
+     */
+    public function updateAvatar(Request $request)
+{
+    $request->validate([
+        'avatar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    $user = auth()->user();
+
+    if ($user->avatar) {
+        Storage::disk('public')->delete($user->avatar);
+    }
+
+    $path = $request->file('avatar')->store('avatars', 'public');
+    $user->update(['avatar' => $path]);
+
+    return back()->with('avatar_success', 'Profile photo updated successfully.');
+}
+
+// Remove Avatar function
+
+public function removeAvatar()
+{
+    $user = auth()->user();
+
+    if ($user->avatar) {
+        Storage::disk('public')->delete($user->avatar);
+        $user->update(['avatar' => null]);
+    }
+
+    return back()->with('avatar_success', 'Profile photo removed.');
+}
+
+
+
+    
 }
