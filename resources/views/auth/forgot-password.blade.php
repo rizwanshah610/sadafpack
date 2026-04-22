@@ -1,25 +1,82 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Forgot Password</title>
+
+    {{-- Bootstrap --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    {{-- Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    {{-- AdminLTE --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+</head>
+
+<body class="hold-transition login-page">
+
+<div class="login-box">
+
+    <div class="login-logo">
+        <b>Forgot</b> Password
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="card">
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+        <div class="card-body login-card-body">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <p class="login-box-msg">
+                Enter your email and we will send you a password reset link.
+            </p>
+
+            {{-- Success Message --}}
+            @if (session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('password.email') }}">
+                @csrf
+
+                {{-- Email --}}
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email"
+                           name="email"
+                           class="form-control"
+                           value="{{ old('email') }}"
+                           required
+                           autofocus>
+
+                    @error('email')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Submit --}}
+                <button type="submit" class="btn btn-primary btn-block">
+                    Send Password Reset Link
+                </button>
+
+            </form>
+
+            <p class="mt-3 mb-1 text-center">
+                <a href="{{ route('login') }}">Back to Login</a>
+            </p>
+
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+
+</div>
+
+{{-- Scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+</body>
+</html>

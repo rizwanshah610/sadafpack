@@ -1,29 +1,83 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+@section('title', 'Profile')
+
+@section('content')
+
+<div class="content-header">
+    <div class="container-fluid">
+        <h1 class="m-0">Profile</h1>
+    </div>
+</div>
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <!-- Left Profile Card -->
+        <div class="col-md-3">
+            <div class="card card-primary card-outline">
+                <div class="card-body box-profile text-center">
+
+                    <img class="profile-user-img img-fluid img-circle"
+                         src="{{ asset('images/user.png') }}"
+                         alt="User profile picture">
+
+                    <h3 class="profile-username">
+                        {{ auth()->user()->name }}
+                    </h3>
+
+                    <p class="text-muted">
+                        {{ auth()->user()->email }}
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side -->
+        <div class="col-md-9">
+
+            <!-- Profile Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user mr-2"></i> Update Profile Information
+                    </h3>
+                </div>
+                <div class="card-body">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <!-- Password -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-lock mr-2"></i> Change Password
+                    </h3>
+                </div>
+                <div class="card-body">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <!-- Delete -->
+            <div class="card card-danger">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-trash mr-2"></i> Delete Account
+                    </h3>
+                </div>
+                <div class="card-body">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>
+
         </div>
+
     </div>
-</x-app-layout>
+
+</div>
+
+@endsection
