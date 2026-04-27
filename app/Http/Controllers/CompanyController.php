@@ -117,4 +117,24 @@ class CompanyController extends Controller
         return redirect()->route('companies.index')
                          ->with('success', 'Company deleted successfully!');
     }
+
+
+    //API endpoint for dynamic product loading
+
+    public function products(Company $company)
+{
+    $products = $company->products()->with('packageSizes')->get();
+
+    return response()->json(
+        $products->map(fn($p) => [
+            'id'            => $p->id,
+            'name'          => $p->name,
+            'price'         => $p->price,
+            'package_sizes' => $p->packageSizes->map(fn($ps) => [
+                'id'   => $ps->id,
+                'name' => $ps->name,
+            ]),
+        ])
+    );
+}
 }

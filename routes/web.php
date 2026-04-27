@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageSizeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -15,11 +16,12 @@ use App\Http\Controllers\Admin\SettingsController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root → login
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('admin.dashboard');
+    }
     return redirect()->route('login');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -28,35 +30,38 @@ Route::get('/', function () {
 */
 Route::middleware(['auth'])->prefix('admin')->group(function () {
 
-    // Admin Dashboard — accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('admin.dashboard');
 
-    // Companies CRUD — super_admin and admin only
     Route::middleware(['role:super_admin|admin'])->group(function () {
         Route::resource('companies', CompanyController::class);
         Route::resource('products', ProductController::class);
         Route::resource('products.sizes', PackageSizeController::class);
+
+        Route::resource('orders', OrderController::class);
+        Route::get('orders/{order}/download', [OrderController::class, 'download'])
+            ->name('orders.download');
     });
 
-    // Staff Management — super_admin only
     Route::middleware(['role:super_admin'])->group(function () {
         Route::resource('staff', StaffController::class)->parameters([
             'staff' => 'user'
         ]);
     });
 
+    Route::get('settings/general', [SettingsController::class, 'index'])
+        ->name('admin.settings.general');
+    Route::post('settings/general', [SettingsController::class, 'update'])
+        ->name('admin.settings.update');
 
-    // Setting of CMS
-    Route::get('settings/general', [SettingsController::class, 'index'])->name('admin.settings.general');
-    Route::post('settings/general', [SettingsController::class, 'update'])->name('admin.settings.update');
-
+        // API endpoint for dynamic product loading
+Route::get('api/companies/{company}/products', [CompanyController::class, 'products'])
+->name('api.companies.products');
 });
-
 
 /*
 |--------------------------------------------------------------------------
-| Profile Routes (Breeze Default)
+| Profile Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -75,13 +80,11 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])
         ->name('profile.avatar.remove');
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes (Login, Register, Logout)
+| Auth Routes
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';

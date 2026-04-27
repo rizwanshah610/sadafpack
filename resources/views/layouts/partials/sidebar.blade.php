@@ -12,9 +12,6 @@
     </a>
 
     <div class="sidebar">
-
-        
-
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
@@ -49,6 +46,16 @@
                 </li>
                 @endrole
 
+                {{-- 4. Orders — super_admin and admin --}}
+                @role('super_admin|admin')
+                <li class="nav-item">
+                    <a href="{{ route('orders.index') }}"
+                       class="nav-link {{ request()->is('admin/orders*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>Orders</p>
+                    </a>
+                </li>
+                @endrole
 
                 {{-- 5. Staff Management — super_admin only --}}
                 @role('super_admin')
