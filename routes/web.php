@@ -41,7 +41,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::resource('orders', OrderController::class);
         Route::get('orders/{order}/download', [OrderController::class, 'download'])
             ->name('orders.download');
+
+            //Job card for order
+        Route::get('orders/{order}/jobcard', [OrderController::class, 'jobCard'])->name('orders.jobcard');
     });
+
+
 
     Route::middleware(['role:super_admin'])->group(function () {
         Route::resource('staff', StaffController::class)->parameters([

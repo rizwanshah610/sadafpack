@@ -161,7 +161,21 @@ class OrderController extends Controller
     }
 
     public function download(Order $order)
-    {
-        abort(501, 'Download not implemented yet.');
-    }
+{
+    $order->load('company', 'items.product', 'items.packageSizes.packageSize');
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.orders.pdf', compact('order'));
+
+    return $pdf->download("order-{$order->id}.pdf");
+}
+
+// Job card for order
+
+public function jobCard(Order $order)
+{
+    $order->load('company', 'items.product.packageSizes', 'items.packageSizes.packageSize');
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.orders.jobcard', compact('order'))
+        ->setPaper('a4', 'portrait');
+    return $pdf->stream("jobcard-order-{$order->id}.pdf");
+}
 }

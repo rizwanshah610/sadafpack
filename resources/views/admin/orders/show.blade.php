@@ -36,6 +36,9 @@
                         <a href="{{ route('orders.edit', $order) }}" class="btn btn-sm btn-warning">
                             <i class="fas fa-edit mr-1"></i> Edit
                         </a>
+                        <a href="{{ route('orders.jobcard', $order) }}" class="btn btn-sm btn-success">
+    <i class="fas fa-id-card mr-1"></i> Job Card
+</a>
                     </div>
                 </div>
                 <div class="card-body">
