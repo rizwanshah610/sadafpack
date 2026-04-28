@@ -131,8 +131,10 @@ class CompanyController extends Controller
             'name'          => $p->name,
             'price'         => $p->price,
             'package_sizes' => $p->packageSizes->map(fn($ps) => [
-                'id'   => $ps->id,
-                'name' => $ps->name,
+                'id'              => $ps->id,
+                'name'            => $ps->name,
+                'effective_price' => !is_null($ps->price) ? (float) $ps->price : (float) $p->price,
+                'has_own_price'   => !is_null($ps->price),
             ]),
         ])
     );

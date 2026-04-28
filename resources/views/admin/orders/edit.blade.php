@@ -30,22 +30,22 @@
     @endif
 
     {{-- Pass existing order data to JS --}}
-@php
-    $existingOrderJson = json_encode([
-        'company_id' => $order->company_id,
-        'items' => $order->items->map(fn($item) => [
-            'product_id' => $item->product_id,
-            'price'      => $item->price,
-            'sizes'      => $item->packageSizes->map(fn($ps) => [
-                'package_size_id' => $ps->package_size_id,
-                'quantity'        => $ps->quantity,
+    @php
+        $existingOrderJson = json_encode([
+            'company_id' => $order->company_id,
+            'items' => $order->items->map(fn($item) => [
+                'product_id' => $item->product_id,
+                'price'      => $item->price,
+                'sizes'      => $item->packageSizes->map(fn($ps) => [
+                    'package_size_id' => $ps->package_size_id,
+                    'quantity'        => $ps->quantity,
+                ])->toArray(),
             ])->toArray(),
-        ])->toArray(),
-    ]);
-@endphp
-<script>
-    const existingOrder = {!! $existingOrderJson !!};
-</script>
+        ]);
+    @endphp
+    <script>
+        const existingOrder = {!! $existingOrderJson !!};
+    </script>
 
     <form action="{{ route('orders.update', $order) }}" method="POST" id="orderForm">
         @csrf
@@ -95,7 +95,7 @@
                             <label>Total Amount</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    <span class="input-group-text">PKR</span>
                                 </div>
                                 <input type="text" id="orderTotal" class="form-control font-weight-bold"
                                        value="{{ number_format($order->total_amount, 2) }}" readonly>
@@ -135,7 +135,7 @@
                                 <tr>
                                     <th style="width:30px;"></th>
                                     <th>Product</th>
-                                    <th style="width:130px;">Price</th>
+                                    <th style="width:130px;">Base Price</th>
                                     <th>Package Sizes & Qty</th>
                                 </tr>
                             </thead>
@@ -164,9 +164,10 @@ const orderTotalEl  = document.getElementById('orderTotal');
 function loadProducts(companyId, prefill) {
     if (!companyId) {
         productsTable.style.display = 'none';
-        emptyState.style.display = 'block';
-        productCount.textContent = 'Select a company';
-        productsBody.innerHTML = '';
+        emptyState.style.display    = 'block';
+        emptyState.innerHTML        = '<i class="fas fa-building fa-2x mb-2"></i><p>Please select a company first</p>';
+        productCount.textContent    = 'Select a company';
+        productsBody.innerHTML      = '';
         recalcTotal();
         return;
     }
@@ -179,20 +180,19 @@ function loadProducts(companyId, prefill) {
             productsBody.innerHTML = '';
 
             if (products.length === 0) {
-                emptyState.innerHTML = '<p class="text-muted py-4 text-center"><i class="fas fa-box-open mr-1"></i> No products for this company.</p>';
+                emptyState.innerHTML     = '<p class="text-muted py-4 text-center"><i class="fas fa-box-open mr-1"></i> No products for this company.</p>';
                 emptyState.style.display = 'block';
                 productsTable.style.display = 'none';
                 productCount.textContent = '0 Products';
                 return;
             }
 
-            emptyState.style.display = 'none';
+            emptyState.style.display    = 'none';
             productsTable.style.display = 'table';
-            productCount.textContent = products.length + ' Products';
+            productCount.textContent    = products.length + ' Products';
 
             products.forEach((product, index) => {
 
-                // Find existing item for this product (if editing)
                 const existingItem = prefill
                     ? prefill.find(i => i.product_id == product.id)
                     : null;
@@ -206,8 +206,12 @@ function loadProducts(companyId, prefill) {
                     const qty = existingPs ? existingPs.quantity : 0;
 
                     return `
-                        <div class="mr-3 mb-1">
-                            <small class="d-block text-muted">${ps.name}</small>
+                        <div class="mr-3 mb-2 size-item" data-unit-price="${ps.effective_price}">
+                            <small class="d-block font-weight-bold">${ps.name}</small>
+                            <small class="d-block mb-1 ${ps.has_own_price ? 'text-success' : 'text-secondary'}">
+                                <i class="fas ${ps.has_own_price ? 'fa-tag' : 'fa-link'}"></i>
+                                PKR ${parseFloat(ps.effective_price).toFixed(2)}
+                            </small>
                             <input type="hidden"
                                    name="products[${index}][package_sizes][${si}][id]"
                                    value="${ps.id}"
@@ -231,7 +235,7 @@ function loadProducts(companyId, prefill) {
                             <strong>${product.name}</strong>
                             <input type="hidden" name="products[${index}][id]" value="${product.id}" ${!isChecked ? 'disabled' : ''}>
                         </td>
-                        <td>
+                        <td class="align-middle">
                             <input type="number" step="0.01" min="0"
                                    name="products[${index}][price]"
                                    class="form-control form-control-sm price-input"
@@ -251,29 +255,29 @@ function loadProducts(companyId, prefill) {
             attachListeners();
             recalcTotal();
         })
-        .catch(() => {
+        .catch(err => {
             productCount.textContent = 'Error loading products';
+            console.error(err);
         });
 }
 
 function attachListeners() {
-    document.querySelectorAll('.qty-input, .price-input').forEach(el => {
+    document.querySelectorAll('.qty-input').forEach(el => {
         el.addEventListener('input', recalcTotal);
     });
 
     document.querySelectorAll('.product-checkbox').forEach(cb => {
         cb.addEventListener('change', function () {
-            const row = this.closest('tr');
-            const inputs = row.querySelectorAll('input[type=number], input[type=hidden]');
+            const row          = this.closest('tr');
             const sizesWrapper = row.querySelector('.sizes-wrapper');
 
             if (this.checked) {
-                inputs.forEach(i => i.disabled = false);
-                sizesWrapper.style.opacity = '1';
+                row.querySelectorAll('input[type=hidden], input[type=number]').forEach(i => i.disabled = false);
+                sizesWrapper.style.opacity       = '1';
                 sizesWrapper.style.pointerEvents = 'auto';
             } else {
-                inputs.forEach(i => i.disabled = true);
-                sizesWrapper.style.opacity = '0.4';
+                row.querySelectorAll('input[type=hidden], input[type=number]').forEach(i => i.disabled = true);
+                sizesWrapper.style.opacity       = '0.4';
                 sizesWrapper.style.pointerEvents = 'none';
                 row.querySelectorAll('.qty-input').forEach(i => i.value = 0);
             }
@@ -287,20 +291,20 @@ function recalcTotal() {
     document.querySelectorAll('#productsBody tr').forEach(row => {
         const cb = row.querySelector('.product-checkbox');
         if (!cb || !cb.checked) return;
-        const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
-        let qty = 0;
-        row.querySelectorAll('.qty-input').forEach(i => qty += parseInt(i.value) || 0);
-        total += price * qty;
+
+        row.querySelectorAll('.size-item').forEach(sizeDiv => {
+            const qty       = parseInt(sizeDiv.querySelector('.qty-input')?.value) || 0;
+            const unitPrice = parseFloat(sizeDiv.dataset.unitPrice) || 0;
+            total += qty * unitPrice;
+        });
     });
     orderTotalEl.value = total.toFixed(2);
 }
 
-// When company changes, reload products without prefill
 companySelect.addEventListener('change', function () {
     loadProducts(this.value, null);
 });
 
-// On page load, load products with existing order data prefilled
 loadProducts(existingOrder.company_id, existingOrder.items);
 </script>
 @endpush

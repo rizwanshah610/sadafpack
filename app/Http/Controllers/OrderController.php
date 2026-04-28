@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\OrderItemPackageSize;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\PackageSize;
 
 class OrderController extends Controller
 {
@@ -20,8 +21,7 @@ class OrderController extends Controller
     public function create()
     {
         $companies = Company::all();
-        $products  = Product::with('packageSizes')->get();
-        return view('admin.orders.create', compact('companies', 'products'));
+        return view('admin.orders.create', compact('companies'));
     }
 
     public function store(Request $request)
@@ -50,23 +50,30 @@ class OrderController extends Controller
             $item = OrderItem::create([
                 'order_id'   => $order->id,
                 'product_id' => $product['id'],
-                'price'      => $product['price'],
+                'price'      => $product['price'], // product base price
             ]);
-
-            $productQty = 0;
 
             foreach ($product['package_sizes'] as $ps) {
                 if (($ps['qty'] ?? 0) > 0) {
+
+                    // Get size model to determine effective price
+                    $size = PackageSize::find($ps['id']);
+
+                    // Use size price if set, otherwise fall back to product price
+                    $unitPrice = !is_null($size?->price)
+                        ? (float) $size->price
+                        : (float) $product['price'];
+
                     OrderItemPackageSize::create([
                         'order_item_id'   => $item->id,
                         'package_size_id' => $ps['id'],
                         'quantity'        => $ps['qty'],
+                        'unit_price'      => $unitPrice,
                     ]);
-                    $productQty += $ps['qty'];
+
+                    $total += $ps['qty'] * $unitPrice;
                 }
             }
-
-            $total += $productQty * $product['price'];
         }
 
         $order->update(['total_amount' => $total]);
@@ -76,16 +83,15 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('company', 'items.product', 'items.packageSizes');
+        $order->load('company', 'items.product', 'items.packageSizes.packageSize');
         return view('admin.orders.show', compact('order'));
     }
 
     public function edit(Order $order)
     {
         $companies = Company::all();
-        $products  = Product::with('packageSizes')->get();
         $order->load('items.packageSizes');
-        return view('admin.orders.edit', compact('order', 'companies', 'products'));
+        return view('admin.orders.edit', compact('order', 'companies'));
     }
 
     public function update(Request $request, Order $order)
@@ -100,6 +106,7 @@ class OrderController extends Controller
             'products.*.package_sizes' => 'required|array',
         ]);
 
+        // Delete old items
         $order->items()->each(fn($item) => $item->packageSizes()->delete());
         $order->items()->delete();
 
@@ -112,20 +119,25 @@ class OrderController extends Controller
                 'price'      => $product['price'],
             ]);
 
-            $productQty = 0;
-
             foreach ($product['package_sizes'] as $ps) {
                 if (($ps['qty'] ?? 0) > 0) {
+
+                    $size = PackageSize::find($ps['id']);
+
+                    $unitPrice = !is_null($size?->price)
+                        ? (float) $size->price
+                        : (float) $product['price'];
+
                     OrderItemPackageSize::create([
                         'order_item_id'   => $item->id,
                         'package_size_id' => $ps['id'],
                         'quantity'        => $ps['qty'],
+                        'unit_price'      => $unitPrice,
                     ]);
-                    $productQty += $ps['qty'];
+
+                    $total += $ps['qty'] * $unitPrice;
                 }
             }
-
-            $total += $productQty * $product['price'];
         }
 
         $order->update([

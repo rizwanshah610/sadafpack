@@ -34,7 +34,9 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>#</th>
-                            <th>Image</th> <th>Name</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
                             <th>Length</th>
                             <th>Width</th>
                             <th>Height</th>
@@ -52,23 +54,38 @@
                         @forelse($sizes as $size)
                         <tr>
                             <td class="align-middle">{{ $loop->iteration }}</td>
-                            
+
                             <td class="align-middle">
-    @if($size->image)
-        <img src="{{ asset('storage/' . $size->image) }}" 
-             alt="{{ $size->name }}" 
-             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 1px solid #ddd;">
-    @else
-        <img src="https://ui-avatars.com/api/?name={{ urlencode($size->name) }}&background=random&color=fff" 
-             alt="Avatar" 
-             style="width: 50px; height: 50px; border-radius: 50%;">
-    @endif
-</td>
+                                @if($size->image)
+                                    <img src="{{ asset('storage/' . $size->image) }}"
+                                         alt="{{ $size->name }}"
+                                         style="width:50px;height:50px;object-fit:cover;border-radius:50%;border:1px solid #ddd;">
+                                @else
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($size->name) }}&background=random&color=fff"
+                                         alt="Avatar"
+                                         style="width:50px;height:50px;border-radius:50%;">
+                                @endif
+                            </td>
 
                             <td class="align-middle"><strong>{{ $size->name }}</strong></td>
-                            <td class="align-middle">{{ $size->length }}</td>
-                            <td class="align-middle">{{ $size->width }}</td>
-                            <td class="align-middle">{{ $size->height }}</td>
+
+                            <td class="align-middle">
+                                @if(!is_null($size->price))
+                                    <span class="badge badge-success">
+                                        PKR {{ number_format($size->price, 2) }}
+                                    </span>
+                                @else
+                                    <span class="badge badge-secondary"
+                                          title="Using product price: PKR {{ number_format($product->price ?? 0, 2) }}">
+                                        <i class="fas fa-link mr-1"></i>
+                                        PKR {{ number_format($product->price ?? 0, 2) }}
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td class="align-middle">{{ $size->length ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->width ?? '—' }}</td>
+                            <td class="align-middle">{{ $size->height ?? '—' }}</td>
                             <td class="align-middle">{{ $size->sheet_size ?? '—' }}</td>
                             <td class="align-middle">{{ $size->color ?? '—' }}</td>
                             <td class="align-middle">{{ $size->ply ?? '—' }}</td>
@@ -81,7 +98,6 @@
                                    class="btn btn-xs btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
-
                                 <form action="{{ route('products.sizes.destroy', [$product->id, $size->id]) }}"
                                       method="POST" style="display:inline;"
                                       onsubmit="return confirm('Delete this size?')">
@@ -95,7 +111,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="13" class="text-center text-muted py-3">
+                            <td colspan="14" class="text-center text-muted py-3">
                                 <i class="fas fa-inbox mr-1"></i> No sizes found.
                             </td>
                         </tr>
@@ -103,6 +119,15 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- Price legend --}}
+            <div class="px-3 py-2 border-top">
+                <small class="text-muted">
+                    <span class="badge badge-success">PKR X.XX</span> = Size-specific price &nbsp;|&nbsp;
+                    <span class="badge badge-secondary"><i class="fas fa-link"></i> PKR X.XX</span> = Inherited from product price
+                </small>
+            </div>
+
         </div>
         <div class="card-footer clearfix">
             {{ $sizes->links() }}

@@ -58,7 +58,11 @@
                         </tr>
                         <tr>
                             <th>Total Amount</th>
-                            <td><strong class="text-success">{{ number_format($order->total_amount, 2) }}</strong></td>
+                            <td>
+                                <strong class="text-success h5">
+                                    PKR {{ number_format($order->total_amount, 2) }}
+                                </strong>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -72,43 +76,88 @@
                     <h3 class="card-title"><i class="fas fa-box mr-2"></i> Order Items</h3>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-striped table-hover mb-0">
+                    <table class="table table-bordered mb-0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>Product</th>
-                                <th>Price</th>
-                                <th>Package Sizes</th>
-                                <th>Subtotal</th>
+                                <th>Size</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($order->items as $item)
-                            <tr>
-                                <td>{{ $item->product->name ?? '—' }}</td>
-                                <td>{{ number_format($item->price, 2) }}</td>
-                                <td>
+                                @php $itemSubtotal = 0; @endphp
+
+                                @if($item->packageSizes->count())
                                     @foreach($item->packageSizes as $ps)
-                                        <span class="badge badge-info mr-1">
-                                            {{ $ps->packageSize->name ?? $ps->package_size_id }}: {{ $ps->quantity }}
-                                        </span>
+                                        @php
+                                            $unitPrice  = $ps->unit_price ?? $item->price;
+                                            $subtotal   = $unitPrice * $ps->quantity;
+                                            $itemSubtotal += $subtotal;
+                                        @endphp
+                                        <tr>
+                                            @if($loop->first)
+                                                <td class="align-middle font-weight-bold"
+                                                    rowspan="{{ $item->packageSizes->count() }}">
+                                                    <i class="fas fa-box mr-1 text-info"></i>
+                                                    {{ $item->product->name ?? '—' }}
+                                                </td>
+                                            @endif
+                                            <td>
+                                                <span class="badge badge-info">
+                                                    {{ $ps->packageSize->name ?? '—' }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">{{ $ps->quantity }}</td>
+                                            <td class="text-right">
+                                                PKR {{ number_format($unitPrice, 2) }}
+                                                @if(!is_null($ps->packageSize->price ?? null))
+                                                    <br><small class="text-success" title="Size-specific price">
+                                                        <i class="fas fa-tag"></i> size price
+                                                    </small>
+                                                @else
+                                                    <br><small class="text-secondary" title="Inherited from product">
+                                                        <i class="fas fa-link"></i> product price
+                                                    </small>
+                                                @endif
+                                            </td>
+                                            <td class="text-right">
+                                                PKR {{ number_format($subtotal, 2) }}
+                                            </td>
+                                        </tr>
                                     @endforeach
-                                </td>
-                                <td>
-                                    {{ number_format($item->price * $item->packageSizes->sum('quantity'), 2) }}
-                                </td>
-                            </tr>
+
+                                    {{-- Item subtotal row --}}
+                                    <tr class="table-light">
+                                        <td colspan="3" class="text-right text-muted">
+                                            <small>{{ $item->product->name ?? '' }} subtotal</small>
+                                        </td>
+                                        <td class="text-right font-weight-bold" colspan="2">
+                                            PKR {{ number_format($item->packageSizes->sum(fn($ps) => ($ps->unit_price ?? $item->price) * $ps->quantity), 2) }}
+                                        </td>
+                                    </tr>
+
+                                @else
+                                    <tr>
+                                        <td><i class="fas fa-box mr-1 text-info"></i> {{ $item->product->name ?? '—' }}</td>
+                                        <td colspan="4" class="text-muted text-center">No sizes recorded</td>
+                                    </tr>
+                                @endif
+
                             @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-3">
-                                    <i class="fas fa-inbox mr-1"></i> No items.
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        <i class="fas fa-inbox mr-1"></i> No items found.
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                         <tfoot>
-                            <tr class="bg-light">
-                                <th colspan="3" class="text-right">Total:</th>
-                                <th>{{ number_format($order->total_amount, 2) }}</th>
+                            <tr class="bg-dark text-white">
+                                <th colspan="4" class="text-right">Grand Total:</th>
+                                <th class="text-right">PKR {{ number_format($order->total_amount, 2) }}</th>
                             </tr>
                         </tfoot>
                     </table>

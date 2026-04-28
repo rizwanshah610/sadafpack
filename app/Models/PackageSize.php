@@ -8,7 +8,7 @@ class PackageSize extends Model
     protected $table = 'package_sizes';
 
     protected $fillable = [
-        'product_id', 'name',
+        'product_id', 'name', 'price',
         'length',
         'width',
         'height',
@@ -24,4 +24,17 @@ class PackageSize extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+
+/**
+ * Returns size-specific price if set,
+ * otherwise falls back to the parent product price.
+ */
+public function getEffectivePriceAttribute(): float
+{
+    if (!is_null($this->price)) {
+        return (float) $this->price;
+    }
+    return (float) ($this->product->price ?? 0);
+}
 }

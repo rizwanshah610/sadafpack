@@ -10,6 +10,8 @@ class OrderItemPackageSize extends Model
         'order_item_id',
         'package_size_id',
         'quantity',
+        'unit_price',
+
     ];
 
     public function packageSize()
