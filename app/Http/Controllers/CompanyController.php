@@ -35,7 +35,8 @@ class CompanyController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+{
+    try {
         $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'nullable|email|max:255',
@@ -54,8 +55,13 @@ class CompanyController extends Controller
         Company::create($data);
 
         return redirect()->route('companies.index')
-                         ->with('success', 'Company created successfully!');
+            ->with('success', 'Company created successfully!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Failed to create company!');
     }
+}
 
     /**
      * Display the specified resource.
@@ -78,7 +84,8 @@ class CompanyController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Company $company)
-    {
+{
+    try {
         $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'nullable|email|max:255',
@@ -91,7 +98,6 @@ class CompanyController extends Controller
         $data = $request->except('logo');
 
         if ($request->hasFile('logo')) {
-            // Delete old logo
             if ($company->logo) {
                 Storage::disk('public')->delete($company->logo);
             }
@@ -101,22 +107,34 @@ class CompanyController extends Controller
         $company->update($data);
 
         return redirect()->route('companies.index')
-                         ->with('success', 'Company updated successfully!');
+            ->with('success', 'Company updated successfully!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Update failed!');
     }
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Company $company)
-    {
+{
+    try {
         if ($company->logo) {
             Storage::disk('public')->delete($company->logo);
         }
+
         $company->delete();
 
         return redirect()->route('companies.index')
-                         ->with('success', 'Company deleted successfully!');
+            ->with('success', 'Company deleted successfully!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Delete failed!');
     }
+}
 
 
     //API endpoint for dynamic product loading

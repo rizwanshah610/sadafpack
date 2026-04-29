@@ -37,6 +37,76 @@
 {{-- AdminLTE JS --}}
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
+<!-- Sweet Alert Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: "{{ session('success') }}",
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "{{ session('error') }}"
+        });
+    @endif
+
+    @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: "{{ session('warning') }}"
+        });
+    @endif
+
+    @if(session('info'))
+        Swal.fire({
+            icon: 'info',
+            title: 'Info',
+            text: "{{ session('info') }}"
+        });
+    @endif
+
+});
+</script>
+
+
+<!-- Delete Sweet Alert Code -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let form = this.closest('form');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+});
+</script>
 @stack('scripts')
 </body>
 </html>

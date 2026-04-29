@@ -98,15 +98,18 @@
                                    class="btn btn-xs btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                
                                 <form action="{{ route('products.sizes.destroy', [$product->id, $size->id]) }}"
-                                      method="POST" style="display:inline;"
-                                      onsubmit="return confirm('Delete this size?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-xs btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+      method="POST"
+      class="delete-form"
+      style="display:inline;">
+    @csrf
+    @method('DELETE')
+
+    <button type="button" class="btn btn-xs btn-danger delete-btn">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>
                             </td>
                         </tr>
                         @empty

@@ -19,6 +19,7 @@ class PackageSize extends Model
         'nali',
         'unit', 'image'
     ];
+    
 
     public function product()
     {

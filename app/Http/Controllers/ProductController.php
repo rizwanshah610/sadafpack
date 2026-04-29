@@ -32,7 +32,8 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-    {
+{
+    try {
         $request->validate([
             'company_id'  => 'required|exists:companies,id',
             'name'        => 'required|string|max:255',
@@ -50,8 +51,13 @@ class ProductController extends Controller
         Product::create($data);
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product created successfully!');
+            ->with('success', 'Product created successfully!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Failed to create product!');
     }
+}
 
     public function show(Product $product)
     {
@@ -66,7 +72,8 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, Product $product)
-    {
+{
+    try {
         $request->validate([
             'company_id'  => 'required|exists:companies,id',
             'name'        => 'required|string|max:255',
@@ -87,17 +94,29 @@ class ProductController extends Controller
         $product->update($data);
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product updated successfully!');
-    }
+            ->with('success', 'Product updated successfully!');
 
-    public function destroy(Product $product)
-    {
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Update failed!');
+    }
+}
+
+public function destroy(Product $product)
+{
+    try {
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
+
         $product->delete();
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product deleted successfully!');
+            ->with('success', 'Product deleted successfully!');
+
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->with('error', 'Delete failed!');
     }
+}
 }

@@ -47,6 +47,11 @@ class PackageSizeController extends Controller
         // null means "use product price"
         $data['price'] = $request->filled('price') ? $request->price : null;
 
+
+
+        // By defualt sent cm for unit field
+        $data['unit'] = $request->filled('unit') ? $request->unit : 'cm';
+
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('sizes', 'public');
         }
@@ -84,6 +89,10 @@ class PackageSizeController extends Controller
 
         // null means "use product price"
         $data['price'] = $request->filled('price') ? $request->price : null;
+
+
+        //By defualt sent cm if unit select sent empty
+        $data['unit'] = $request->filled('unit') ? $request->unit : 'cm';
 
         if ($request->remove_image == '1') {
             if ($size->image) {

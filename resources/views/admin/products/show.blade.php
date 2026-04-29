@@ -42,7 +42,7 @@
                         <tr><th width="150">Name</th><td>{{ $product->name }}</td></tr>
                         <tr><th>Company</th><td>{{ $product->company->name ?? '—' }}</td></tr>
                         <tr><th>Description</th><td>{{ $product->description ?? '—' }}</td></tr>
-                        <tr><th>Price</th><td>{{ $product->price ? '$' . number_format($product->price, 2) : '—' }}</td></tr>
+                        <tr><th>Price</th><td>{{ $product->price ? 'Rs' . number_format($product->price, 2) : '—' }}</td></tr>
                     </table>
                 </div>
             </div>

@@ -109,15 +109,16 @@
                             <a href="{{ route('orders.download', $order) }}" class="btn btn-xs btn-secondary">
                                 <i class="fas fa-file-pdf"></i> PDF
                             </a>
-                            <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        onclick="return confirm('Delete this order?')"
-                                        class="btn btn-xs btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
+                            <form action="{{ route('orders.destroy', $order) }}"
+      method="POST"
+      class="d-inline delete-form">
+    @csrf
+    @method('DELETE')
+
+    <button type="button" class="btn btn-xs btn-danger delete-btn">
+        <i class="fas fa-trash"></i> Delete
+    </button>
+</form>
                         </td>
                     </tr>
                     @empty

@@ -99,14 +99,16 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('companies.destroy', $company->id) }}"
-                                      method="POST" style="display:inline;"
-                                      onsubmit="return confirm('Are you sure you want to delete this company?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-xs btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+      method="POST"
+      class="delete-form"
+      style="display:inline;">
+    @csrf
+    @method('DELETE')
+
+    <button type="submit" class="btn btn-xs btn-danger delete-btn">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>
                             </td>
                         </tr>
                         @empty

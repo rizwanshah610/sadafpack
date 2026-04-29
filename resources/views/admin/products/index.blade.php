@@ -72,7 +72,7 @@
                                 {{ $product->company->name ?? '—' }}
                             </span>
                         </td>
-                        <td>{{ $product->price ? '$' . number_format($product->price, 2) : '—' }}</td>
+                        <td>{{ $product->price ? 'Rs:' . number_format($product->price, 2) : '—' }}</td>
                         <td>
                             <a href="{{ route('products.sizes.index', $product->id) }}"
                                class="badge badge-warning">
@@ -87,14 +87,16 @@
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('products.destroy', $product->id) }}"
-                                  method="POST" style="display:inline;"
-                                  onsubmit="return confirm('Delete this product?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-xs btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+      method="POST"
+      class="delete-form"
+      style="display:inline;">
+    @csrf
+    @method('DELETE')
+
+    <button type="submit" class="btn btn-xs btn-danger delete-btn">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>
                         </td>
                     </tr>
                     @empty
